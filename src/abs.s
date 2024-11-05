@@ -21,8 +21,11 @@ abs:
     lw t0 0(a0)
     bge t0, zero, done
 
-    # TODO: Add your own implementation
+    not t0, t0          
+    addi t0, t0, 1
 
+    # Store back
+    sw t0, 0(a0)
 done:
     # Epilogue
     jr ra
