@@ -25,10 +25,23 @@
 relu:
     li t0, 1             
     blt a1, t0, error     
-    li t1, 0             
 
 loop_start:
-    # TODO: Add your own implementation
+    lw t1, 0(a0) #Load element address
+    bltz t1,set_zero
+    j store_element
+
+set_zero:
+    li t1, 0 #set element to zero
+
+store_element:
+    sw t1,0(a0)
+    addi a0, a0, 4
+    addi a1, a1, -1
+    bnez a1, loop_start
+    
+end:
+    ret
 
 error:
     li a0, 36          
