@@ -25,14 +25,14 @@ argmax:
     li t6, 1
     blt a1, t6, handle_error
 
-    lw t1, 0(a0)  # t1 store the initial current max value
+    lw t1, 0(a0)        # t1 store the initial current max value
     li t2, 0            # t2 store max value index
     li t3, 0            # t3 loop counter
 
 
 loop_start:
     lw t4, 0(a0)
-    blt t1, t4, update_max #If current max smaller than current element then branch
+    blt t1, t4, update_max  #If current max smaller than current element then branch
     j next_element
 
 update_max:

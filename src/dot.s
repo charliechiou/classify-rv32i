@@ -1,3 +1,6 @@
+.import ./cus_mul.s
+
+
 .globl dot
 
 .text
@@ -42,7 +45,35 @@ loop_start:
     bge t2, a2, loop_end
     lw t3,0(a0)
     lw t4,0(a1)
-    mul t5,t3,t4
+    # mul t5,t3,t4
+
+    addi sp,sp,-36
+    sw t0,0(sp)
+    sw t1,4(sp)
+    sw t2,8(sp)
+    sw a0,12(sp)
+    sw a1,16(sp)
+    sw a2,20(sp)
+    sw a3,24(sp)
+    sw a4,28(sp)
+    sw ra,32(sp)
+
+    mv a0, t3
+    mv a1, t4
+    jal cus_mul
+    mv t5,a0
+
+    lw t0,0(sp)
+    lw t1,4(sp)
+    lw t2,8(sp)
+    lw a0,12(sp)
+    lw a1,16(sp)
+    lw a2,20(sp)
+    lw a3,24(sp)
+    lw a4,28(sp)
+    lw ra,32(sp)
+    addi sp,sp,36
+
     add t0,t0,t5
 
     add a0,a0,a3
