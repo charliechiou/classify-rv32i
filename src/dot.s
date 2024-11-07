@@ -1,7 +1,5 @@
-.import ./cus_mul.s
-
-
 .globl dot
+.import ./cus_mul.s
 
 .text
 # =======================================================
@@ -34,55 +32,55 @@ dot:
     blt a3, t0, error_terminate   
     blt a4, t0, error_terminate  
 
-    li t0,0
-    li t1,0
-    li t2,0     
+    li a5,0
+    li a6,0    #計算迴圈次數
+    li a7,0    #儲存數值
 
     slli a3,a3,2
     slli a4,a4,2
 
 loop_start:
-    bge t2, a2, loop_end
-    lw t3,0(a0)
-    lw t4,0(a1)
-    # mul t5,t3,t4
+    bge a6, a2, loop_end
+    lw t0,0(a0)
+    lw t1,0(a1)
+    # mul t2,t0,t1
 
     addi sp,sp,-36
-    sw t0,0(sp)
-    sw t1,4(sp)
-    sw t2,8(sp)
-    sw a0,12(sp)
-    sw a1,16(sp)
-    sw a2,20(sp)
-    sw a3,24(sp)
-    sw a4,28(sp)
+    sw a0,0(sp)
+    sw a1,4(sp)
+    sw a2,8(sp)
+    sw a3,12(sp)
+    sw a4,16(sp)
+    sw a5,20(sp)
+    sw a6,24(sp)
+    sw a7,28(sp)
     sw ra,32(sp)
 
-    mv a0, t3
-    mv a1, t4
+    mv a0, t0
+    mv a1, t1
     jal cus_mul
-    mv t5,a0
+    mv t2,a0
 
-    lw t0,0(sp)
-    lw t1,4(sp)
-    lw t2,8(sp)
-    lw a0,12(sp)
-    lw a1,16(sp)
-    lw a2,20(sp)
-    lw a3,24(sp)
-    lw a4,28(sp)
+    lw a0,0(sp)
+    lw a1,4(sp)
+    lw a2,8(sp)
+    lw a3,12(sp)
+    lw a4,16(sp)
+    lw a5,20(sp)
+    lw a6,24(sp)
+    lw a7,28(sp)
     lw ra,32(sp)
     addi sp,sp,36
 
-    add t0,t0,t5
+    add a7,a7,t2
 
     add a0,a0,a3
     add a1,a1,a4
-    addi t2,t2,1
+    addi a6,a6,1
     j loop_start
 
 loop_end:
-    mv a0, t0
+    mv a0, a7
     jr ra
 
 error_terminate:

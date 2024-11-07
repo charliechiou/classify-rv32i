@@ -1,4 +1,6 @@
+.import ./cus_mul.s
 .globl classify
+
 
 .text
 # =====================================

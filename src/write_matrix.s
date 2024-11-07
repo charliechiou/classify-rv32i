@@ -1,5 +1,5 @@
-.globl write_matrix
 .import ./cus_mul.s
+.globl write_matrix
 
 .text
 # ==============================================================================

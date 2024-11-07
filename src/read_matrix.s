@@ -1,5 +1,5 @@
-.globl read_matrix
 .import ./cus_mul.s
+.globl read_matrix
 
 .text
 # ==============================================================================
@@ -80,7 +80,6 @@ read_matrix:
     mv a1,t2
     jal cus_mul
     mv s1,a0
-    # FIXME: Replace 'mul' with your own implementation
 
     slli t3, s1, 2
     sw t3, 24(sp)    # size in bytes
