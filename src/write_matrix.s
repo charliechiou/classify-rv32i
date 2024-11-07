@@ -1,4 +1,5 @@
 .globl write_matrix
+.import ./cus_mul.s
 
 .text
 # ==============================================================================
@@ -61,7 +62,11 @@ write_matrix:
     li t0, 2
     bne a0, t0, fwrite_error
 
-    mul s4, s2, s3   # s4 = total elements
+    # mul s4, s2, s3   # s4 = total elements
+    mv a0, s2
+    mv a1, s3
+    jal cus_mul
+    mv s4, a0
     # FIXME: Replace 'mul' with your own implementation
 
     # write matrix data to file
