@@ -76,10 +76,21 @@ read_matrix:
     sw t2, 0(s4)     # saves num cols
 
     # mul s1, t1, t2   # s1 is number of elements
-    mv a0,t1
-    mv a1,t2
-    jal cus_mul
-    mv s1,a0
+mul:
+    li s1,0
+
+mul_loop_start:
+    beq t2,x0,mul_loop_end
+    andi t3,t2,1
+    beq t3,x0,mul_skip
+    add s1,s1,t1
+
+mul_skip:
+    slli t1,t1,1
+    srli t2,t2,1
+    j mul_loop_start
+
+mul_loop_end:
 
     slli t3, s1, 2
     sw t3, 24(sp)    # size in bytes
