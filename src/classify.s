@@ -170,17 +170,21 @@ classify:
     lw t1, 0(s8)
 
     #call custom mul
-    addi sp,sp,-8
-    sw t0,0(sp)
-    sw t1,4(sp)
+mul_for_read_matrix:
+    li a0,0
 
-    mv a0, t0
-    mv a1, t1
-    jal cus_mul
+mul_loop_start_for_read_matrix:
+    beq t1,x0,mul_loop_end_for_read_matrix
+    andi t3,t1,1
+    beq t3,x0,mul_skip_for_read_matrix
+    add a0,a0,t0
 
-    lw t0,0(sp)
-    lw t1,4(sp)
-    addi sp,sp,8
+mul_skip_for_read_matrix:
+    slli t0,t0,1
+    srli t1,t1,1
+    j mul_loop_start_for_read_matrix
+
+mul_loop_end_for_read_matrix:
 
     slli a0, a0, 2
     jal malloc 
@@ -220,20 +224,21 @@ classify:
     lw t1, 0(s8)
 
     #call custom mul
-    addi sp,sp,-12
-    sw t0,0(sp)
-    sw t1,4(sp)
-    sw a0,8(sp)
+mul_for_relu:
+    li a1,0
 
-    mv a0, t0
-    mv a1, t1
-    jal cus_mul
-    mv a1,a0
+mul_loop_start_for_relu:
+    beq t1,x0,mul_loop_end_for_relu
+    andi t3,t1,1
+    beq t3,x0,mul_skip_for_relu
+    add a1,a1,t0
 
-    lw t0,0(sp)
-    lw t1,4(sp)
-    lw a0,8(sp)
-    addi sp,sp,12
+mul_skip_for_relu:
+    slli t0,t0,1
+    srli t1,t1,1
+    j mul_loop_start_for_relu
+
+mul_loop_end_for_relu:
     
     jal relu
     
@@ -257,17 +262,21 @@ classify:
     lw t1, 0(s6)
 
     #call custom mul
-    addi sp,sp,-8
-    sw t0,0(sp)
-    sw t1,4(sp)
+mul_for_matmul:
+    li a0,0
 
-    mv a0,t0
-    mv a1,t1
-    jal cus_mul
+mul_loop_start_for_matmul:
+    beq t1,x0,mul_loop_end_for_matmul
+    andi t3,t1,1
+    beq t3,x0,mul_skip_for_matmul
+    add a0,a0,t0
 
-    lw t0,0(sp)
-    lw t1,4(sp)
-    addi sp,sp,8
+mul_skip_for_matmul:
+    slli t0,t0,1
+    srli t1,t1,1
+    j mul_loop_start_for_matmul
+
+mul_loop_end_for_matmul:
 
     slli a0, a0, 2
     jal malloc 
@@ -330,21 +339,21 @@ classify:
     lw t1, 0(s6)
     
     #call custom mul
-    addi sp,sp,-12
-    sw a0,0(sp)
-    sw t0,4(sp)
-    sw t1,8(sp)
+mul_for_argmax:
+    li a1,0
 
-    mv a0,t0
-    mv a1,t1
-    jal cus_mul
+mul_loop_start_for_argmax:
+    beq t1,x0,mul_loop_end_for_argmax
+    andi t3,t1,1
+    beq t3,x0,mul_skip_for_argmax
+    add a1,a1,t0
 
-    mv a1,a0
+mul_skip_for_argmax:
+    slli t0,t0,1
+    srli t1,t1,1
+    j mul_loop_start_for_argmax
 
-    lw a0,0(sp)
-    lw t0,4(sp)
-    lw t1,8(sp)
-    addi sp,sp,12
+mul_loop_end_for_argmax:
     
     jal argmax
     
