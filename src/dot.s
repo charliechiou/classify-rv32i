@@ -45,32 +45,21 @@ loop_start:
     lw t1,0(a1)
     # mul t2,t0,t1
 
-    addi sp,sp,-36
-    sw a0,0(sp)
-    sw a1,4(sp)
-    sw a2,8(sp)
-    sw a3,12(sp)
-    sw a4,16(sp)
-    sw a5,20(sp)
-    sw a6,24(sp)
-    sw a7,28(sp)
-    sw ra,32(sp)
+mul:
+    li t2,0
 
-    mv a0, t0
-    mv a1, t1
-    jal cus_mul
-    mv t2,a0
+mul_loop_start:
+    beq t1,x0,mul_loop_end
+    andi t3,t1,1
+    beq t3,x0,mul_skip
+    add t2,t2,t0
 
-    lw a0,0(sp)
-    lw a1,4(sp)
-    lw a2,8(sp)
-    lw a3,12(sp)
-    lw a4,16(sp)
-    lw a5,20(sp)
-    lw a6,24(sp)
-    lw a7,28(sp)
-    lw ra,32(sp)
-    addi sp,sp,36
+mul_skip:
+    slli t0,t0,1
+    srli t1,t1,1
+    j mul_loop_start
+
+mul_loop_end:
 
     add a7,a7,t2
 
