@@ -63,11 +63,21 @@ write_matrix:
     bne a0, t0, fwrite_error
 
     # mul s4, s2, s3   # s4 = total elements
-    mv a0, s2
-    mv a1, s3
-    jal cus_mul
-    mv s4, a0
-    # FIXME: Replace 'mul' with your own implementation
+mul:
+    li s4,0
+
+mul_loop_start:
+    beq s3,x0,mul_loop_end
+    andi t3,s3,1
+    beq t3,x0,mul_skip
+    add s4,s4,s2
+
+mul_skip:
+    slli s2,s2,1
+    srli s3,s3,1
+    j mul_loop_start
+
+mul_loop_end:
 
     # write matrix data to file
     mv a0, s0
