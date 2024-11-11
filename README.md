@@ -23,3 +23,8 @@ To enable our model to learn more complex relationships within the data, we impl
 If the input value is less than 0, the output is set to 0. If the input value is greater than or equal to 0, the output equals the input.  
 ### Methodology
 I used the `bnez` instruction to iterate through the input vector and employed `bltz` to check whether each element is less than zero. If so, jump to `set_zero` and set the value to zero.
+
+## Argmax
+By using the argmax function, we can find the index of the largest value in the output. This index corresponds to the predicted class, allowing us to determine the model's prediction.
+### Methodology
+Setting the first element as the initial maximum value and use the `blt` instruction to loop through the input. If an element is larger than the current maximum stored in `t2`, the program jumps to the `update_max` label, where the maximum value and its index are updated.
