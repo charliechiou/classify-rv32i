@@ -19,9 +19,7 @@ The following will describe the purpose and function of each component :
 
 ## ReLu ( Rectified Linear Unit )
 To enable our model to learn more complex relationships within the data, we implemented the Rectified Linear Unit (ReLU) activation function.  
-$$
-f(x) = \max(0, x)
-$$
+$$ f(x) = \max(0, x) $$
 If the input value is less than 0, the output is set to 0. If the input value is greater than or equal to 0, the output equals the input.  
 ### Methodology
 I used the `bnez` instruction to iterate through the input vector and employed `bltz` to check whether each element is less than zero. If so, jump to `set_zero` and set the value to zero.
