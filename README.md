@@ -5,18 +5,24 @@
  ### Part A : Mathematical Functions  
 Implement essential matrix operations critical for neural network inference, including:  
 + **ReLu ( Rectified Linear Unit )** : Activation function to filter out negative values within the matrix.  
+
 + **ArgMax** : Find out the index of the maximum value in a matrix.
+
 + **Dot Product** : Calculate the dot product of two vextors.
+
 + **Matrix Multiplication** : Calculate the multiplication of two matrixs to support the data flow between two matrices.
 
  ### Part B : File Operations
  Implement some essential file operation including:  
  + **Read Matrix** : Read matrix data from file for the network.
+
  + **Write Matrix** : Writes matrix data to file to save the results.  
    
 ---
 #### The following will describe the purpose and function of each component :
+
 ## ReLu ( Rectified Linear Unit )
+
 ### Introduction
 
 To enable our model to learn more complex relationships within the data, we implemented the Rectified Linear Unit (ReLU) activation function.  
@@ -27,12 +33,14 @@ If the input value is less than 0, the output is set to 0. If the input value is
 I used the `bnez` instruction to iterate through the input vector and employed `bltz` to check whether each element is less than zero. If so, jump to `set_zero` and set the value to zero.
 
 ## Argmax
+
 ### Introduction
 By using the argmax function, we can find the index of the largest value in the output. This index corresponds to the predicted class, allowing us to determine the model's prediction.
 ### Methodology
 Setting the first element as the initial maximum value and use the `blt` instruction to loop through the input. If an element is larger than the current maximum stored in `t2`, the program jumps to the `update_max` label, where the maximum value and its index are updated.
 
 ## Dot product
+
 ### Introduction
 The dot product operation requires two input vectors of equal length, multiplying them element by element. In this project, we need to use the `dot` function to perform matrix multiplication.
 
@@ -43,6 +51,7 @@ Each element, based on the current index, is multiplied using bitwise operations
 The result of each multiplication (t2) is accumulated into a7.
 
 ## Matrix Multiplication
+
 ### Introduction
 For matric multiplication，it is important to handling the stride.When multiply A and B, we have to dot product the **row** of A and **column** of B to get the element of output C.Therefore, the stride of A will be `1` and the stride of B will be `the column number of B`.
 
@@ -55,7 +64,17 @@ The outer loop uses `s0` as a counter to track the current row of A. After confi
 In the inner loop, pointers are set to the beginning of the current row of A and the current column of B. The appropriate stride values are configured, and then the dot function is called to calculate and store the resulting element in matrix C.
 
 ## Read Matrix
+
 ### Introduction
 To load pretrained MNIST weights, we need to implement a function that reads matrix data from a binary file. This function dynamically allocate memory and retrieve the matrix dimensions from the file header.
+
 ### Methodology
 Using the `fopen` function in `util.s`, we can obtain the file descriptor of the binary file. To read the file contents, we use the `fread` function. First, we read the number of rows and columns from the file header, then calculate the matrix size by multiplying these values. Following that, we use the same approach to read each element of the matrix into memory.
+
+## Write Matrix
+
+### Introduction
+After calculating the result, we need to write it back to the binary file. The `write_matrix` function first write the matrix dimensions as the header, then allocate memory to store the result, and finally write each matrix element into the file.
+
+### Methodology
+Similar to reading the matrix, first open the file to obtain the file descriptor. Then, use fwrite to write the matrix dimensions as the header. By multiplying the rows and columns, we can determine the matrix size. Using the same approach of `fwrite`, write each element of the matrix into the file.
