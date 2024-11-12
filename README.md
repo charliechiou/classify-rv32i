@@ -32,7 +32,7 @@ If the input value is less than 0, the output is set to 0. If the input value is
 ### Methodology
 Using the `bnez` instruction to check whether there are still element need to be handle and employed `bltz` to check whether each element is less than zero.
 
-```assembly
+```
 loop_start:
     ...
     bltz t1,set_zero
@@ -46,7 +46,7 @@ end:
 
 If so, jump to `set_zero` and set the value to zero.
 
-```assembly
+```
 set_zero:
     li t1, 0 #set element to zero
 ```
@@ -55,7 +55,34 @@ set_zero:
 ### Introduction
 By using the argmax function, we can find the index of the largest value in the output. This index corresponds to the predicted class, allowing us to determine the model's prediction.
 ### Methodology
-Setting the first element as the initial maximum value and use the `blt` instruction to loop through the input. If an element is larger than the current maximum stored in `t2`, the program jumps to the `update_max` label, where the maximum value and its index are updated.
+Setting the first element as the initial maximum value
+
+```
+    lw t1, 0(a0)        # t1 store the initial current max value
+    li t2, 0            # t2 store max value index
+```
+
+ use the `blt` instruction to loop through the input. 
+ 
+```
+loop_start:
+    ...
+    j next_element
+    ...
+
+next_element:
+    addi t3, t3, 1 
+    blt t3,a1,loop_start
+```
+
+ If an element is larger than the current maximum stored in `t2`, the program jumps to the `update_max` label, where the maximum value and its index are updated.
+
+ ```
+    blt t1, t4, update_max  #If current max smaller than current element then branch
+update_max:
+    mv t1, t4  #update current max value
+    mv t2, t3  #update current max value index
+ ```
 
 ## Dot product
 
