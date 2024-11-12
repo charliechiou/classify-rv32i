@@ -143,11 +143,70 @@ For matric multiplication，it is important to handling the stride.When multiply
 
 ### Methodology
 First, ensure that all inputs are valid (i.e., all values are positive).
+
+```
+    li t0 1
+    blt a1, t0, error
+    blt a2, t0, error
+    blt a4, t0, error
+    blt a5, t0, error
+    bne a2, a4, error
+```
+
 This process is similar to the dot product calculation, but with two loops to iterate through each **row of matrix A** and each **column of matrix B**.
+
+```
+outer_loop_start:
+    li s1, 0 #reset inner loop counter
+    ...
+    blt s0, a1, inner_loop_start
+
+    j outer_loop_end
+    
+inner_loop_start:
+    beq s1, a5, inner_loop_end
+    ...
+    addi s1, s1, 1
+    j inner_loop_start
+    
+inner_loop_end:
+    ...
+    addi s0,s0,1
+    j outer_loop_start       # repeat outer loop
+
+outer_loop_end:
+```
 
 The outer loop uses `s0` as a counter to track the current row of A. After confirming that there are rows left to process (i.e., `s0` < `a1`), it proceeds to the inner loop.
 
 In the inner loop, pointers are set to the beginning of the current row of A and the current column of B. The appropriate stride values are configured, and then the dot function is called to calculate and store the resulting element in matrix C.
+```
+    addi sp, sp, -24
+    sw a0, 0(sp)
+    sw a1, 4(sp)
+    sw a2, 8(sp)
+    sw a3, 12(sp)
+    sw a4, 16(sp)
+    sw a5, 20(sp)
+    
+    mv a0, s3 # setting pointer for matrix A into the correct argument value
+    mv a1, s4 # setting pointer for Matrix B into the correct argument value
+    mv a2, a2 # setting the number of elements to use to the columns of A
+    li a3, 1 # stride for matrix A
+    mv a4, a5 # stride for matrix B
+    
+    jal dot
+    
+    mv t0, a0 # storing result of the dot product into t0
+    
+    lw a0, 0(sp)
+    lw a1, 4(sp)
+    lw a2, 8(sp)
+    lw a3, 12(sp)
+    lw a4, 16(sp)
+    lw a5, 20(sp)
+    addi sp, sp, 24
+```
 
 ## Read Matrix
 

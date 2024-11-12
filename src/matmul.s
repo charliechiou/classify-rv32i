@@ -61,7 +61,7 @@ matmul:
     
 outer_loop_start:
     #s0 is going to be the loop counter for the rows in A
-    li s1, 0
+    li s1, 0 #reset inner loop counter
     mv s4, a3
     blt s0, a1, inner_loop_start
 
