@@ -37,3 +37,14 @@ First, ensure that all inputs are valid (i.e., all are positive).
 The loop runs a2 times to process each element in the input arrays.
 Each element, based on the current index, is multiplied using bitwise operations.
 The result of each multiplication (t2) is accumulated into a7.
+
+## Matrix Multiplication
+For matric multiplication，it is important to handling the stride.When multiply A and B, we have to dot product the **row** of A and **column** of B to get the element of output C.Therefore, the stride of A will be `1` and the stride of B will be `the column number of B`.
+
+### Methodology
+First, ensure that all inputs are valid (i.e., all values are positive).
+This process is similar to the dot product calculation, but with two loops to iterate through each **row of matrix A** and each **column of matrix B**.
+
+The outer loop uses `s0` as a counter to track the current row of A. After confirming that there are rows left to process (i.e., `s0` < `a1`), it proceeds to the inner loop.
+
+In the inner loop, pointers are set to the beginning of the current row of A and the current column of B. The appropriate stride values are configured, and then the dot function is called to calculate and store the resulting element in matrix C.
