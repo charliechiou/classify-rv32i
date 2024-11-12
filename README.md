@@ -132,6 +132,7 @@ mul_loop_end:
 ```
 
 The result of each multiplication `t2` is accumulated into `a7`.
+
 ```
     add a7,a7,t2
 ```
@@ -180,6 +181,7 @@ outer_loop_end:
 The outer loop uses `s0` as a counter to track the current row of A. After confirming that there are rows left to process (i.e., `s0` < `a1`), it proceeds to the inner loop.
 
 In the inner loop, pointers are set to the beginning of the current row of A and the current column of B. The appropriate stride values are configured, and then the dot function is called to calculate and store the resulting element in matrix C.
+
 ```
     addi sp, sp, -24
     sw a0, 0(sp)
@@ -215,6 +217,7 @@ To load pretrained MNIST weights, we need to implement a function that reads mat
 
 ### Methodology
 Using the `fopen` function in `util.s`, we can obtain the file descriptor of the binary file. 
+
 ```
 fopen:
     mv a2 a1
@@ -226,6 +229,7 @@ fopen:
 ```
 
 To read the file contents, we use the `fread` function. 
+
 ```
 fread:
     mv a3 a2
@@ -238,6 +242,7 @@ fread:
 ```
 
 First, we read the number of rows and columns from the file header, 
+
 ```
     lw t1, 28(sp)    # opening to save num rows
     lw t2, 32(sp)    # opening to save num cols
@@ -284,4 +289,71 @@ Following that, we use the same approach to read each element of the matrix into
 After calculating the result, we need to write it back to the binary file. The `write_matrix` function first write the matrix dimensions as the header, then allocate memory to store the result, and finally write each matrix element into the file.
 
 ### Methodology
-Similar to reading the matrix, first open the file to obtain the file descriptor. Then, use fwrite to write the matrix dimensions as the header. By multiplying the rows and columns, we can determine the matrix size. Using the same approach of `fwrite`, write each element of the matrix into the file.
+Similar to reading the matrix, first open the file to obtain the file descriptor.
+
+```
+fopen:
+    mv a2 a1
+    mv a1 a0
+    li a0 c_openFile
+    ecall
+    #FOPEN_RETURN_HOOK
+    jr ra
+```
+
+Then, use `fwrite` to write the matrix dimensions as the header. 
+
+```
+fwrite:
+    mv a4 a3
+    mv a3 a2
+    mv a2 a1
+    mv a1 a0
+    li a0 c_writeFile
+    ecall
+    #FWRITE_RETURN_HOOK
+    jr ra
+```
+
+By multiplying the rows and columns, we can determine the matrix size. 
+
+```
+mul:
+    li s4,0
+
+mul_loop_start:
+    beq s3,x0,mul_loop_end
+    andi t3,s3,1
+    beq t3,x0,mul_skip
+    add s4,s4,s2
+
+mul_skip:
+    slli s2,s2,1
+    srli s3,s3,1
+    j mul_loop_start
+
+mul_loop_end:
+```
+
+Using the same approach of `fwrite`, write each element of the matrix into the file.
+
++ write the matrix dimension
+
+```
+    mv a0, s0
+    addi a1, sp, 24  # buffer with rows and columns
+    li a2, 2         # number of elements to write
+    li a3, 4         # size of each element
+
+    jal fwrite
+```
+
++ write the matrix
+```
+    mv a0, s0
+    mv a1, s1        # matrix data pointer
+    mv a2, s4        # number of elements to write
+    li a3, 4         # size of each element
+
+    jal fwrite
+```
