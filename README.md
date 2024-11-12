@@ -28,3 +28,12 @@ I used the `bnez` instruction to iterate through the input vector and employed `
 By using the argmax function, we can find the index of the largest value in the output. This index corresponds to the predicted class, allowing us to determine the model's prediction.
 ### Methodology
 Setting the first element as the initial maximum value and use the `blt` instruction to loop through the input. If an element is larger than the current maximum stored in `t2`, the program jumps to the `update_max` label, where the maximum value and its index are updated.
+
+## Dot product
+The dot product operation requires two input vectors of equal length, multiplying them element by element. In this project, we need to use the `dot` function to perform matrix multiplication.
+
+### Methodology
+First, ensure that all inputs are valid (i.e., all are positive).
+The loop runs a2 times to process each element in the input arrays.
+Each element, based on the current index, is multiplied using bitwise operations.
+The result of each multiplication (t2) is accumulated into a7.
