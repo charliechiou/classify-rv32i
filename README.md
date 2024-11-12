@@ -214,7 +214,69 @@ In the inner loop, pointers are set to the beginning of the current row of A and
 To load pretrained MNIST weights, we need to implement a function that reads matrix data from a binary file. This function dynamically allocate memory and retrieve the matrix dimensions from the file header.
 
 ### Methodology
-Using the `fopen` function in `util.s`, we can obtain the file descriptor of the binary file. To read the file contents, we use the `fread` function. First, we read the number of rows and columns from the file header, then calculate the matrix size by multiplying these values. Following that, we use the same approach to read each element of the matrix into memory.
+Using the `fopen` function in `util.s`, we can obtain the file descriptor of the binary file. 
+```
+fopen:
+    mv a2 a1
+    mv a1 a0
+    li a0 c_openFile
+    ecall
+    #FOPEN_RETURN_HOOK
+    jr ra
+```
+
+To read the file contents, we use the `fread` function. 
+```
+fread:
+    mv a3 a2
+    mv a2 a1
+    mv a1 a0
+    li a0 c_readFile
+    ecall
+    #FREAD_RETURN_HOOK
+    jr ra
+```
+
+First, we read the number of rows and columns from the file header, 
+```
+    lw t1, 28(sp)    # opening to save num rows
+    lw t2, 32(sp)    # opening to save num cols
+
+    sw t1, 0(s3)     # saves num rows
+    sw t2, 0(s4)     # saves num cols
+```
+
+then calculate the matrix size by multiplying these values.
+
+```
+mul:
+    li s1,0
+
+mul_loop_start:
+    beq t2,x0,mul_loop_end
+    andi t3,t2,1
+    beq t3,x0,mul_skip
+    add s1,s1,t1
+
+mul_skip:
+    slli t1,t1,1
+    srli t2,t2,1
+    j mul_loop_start
+
+mul_loop_end:
+```
+
+Following that, we use the same approach to read each element of the matrix into memory.
+
+```
+    # set up file, buffer and bytes to read
+    mv s2, a0        # matrix
+    mv a0, s0
+    mv a1, s2
+    lw a2, 24(sp)
+
+    jal fread
+```
 
 ## Write Matrix
 
