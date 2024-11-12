@@ -33,8 +33,8 @@ dot:
     blt a4, t0, error_terminate  
 
     li a5,0
-    li a6,0    #計算迴圈次數
-    li a7,0    #儲存數值
+    li a6,0    #loop counter
+    li a7,0    #store the result
 
     slli a3,a3,2
     slli a4,a4,2
@@ -43,8 +43,6 @@ loop_start:
     bge a6, a2, loop_end
     lw t0,0(a0)
     lw t1,0(a1)
-    # mul t2,t0,t1
-
 mul:
     li t2,0
 
@@ -63,9 +61,9 @@ mul_loop_end:
 
     add a7,a7,t2
 
-    add a0,a0,a3
-    add a1,a1,a4
-    addi a6,a6,1
+    add a0,a0,a3 #update the first input vector's pointer
+    add a1,a1,a4 #update the second input vector's pointer
+    addi a6,a6,1 #add the loop counter
     j loop_start
 
 loop_end:

@@ -91,9 +91,50 @@ The dot product operation requires two input vectors of equal length, multiplyin
 
 ### Methodology
 First, ensure that all inputs are valid (i.e., all are positive).
-The loop runs a2 times to process each element in the input arrays.
+
+```
+    li t0, 1
+    blt a2, t0, error_terminate  
+    blt a3, t0, error_terminate   
+    blt a4, t0, error_terminate  
+```
+
+The loop runs `a2` times to process each element in the input arrays.
+
+```
+loop_start:
+    bge a6, a2, loop_end
+    ...
+    addi a6,a6,1
+    j loop_start
+
+loop_end:
+```
+
 Each element, based on the current index, is multiplied using bitwise operations.
-The result of each multiplication (t2) is accumulated into a7.
+
+```
+mul:
+    li t2,0
+
+mul_loop_start:
+    beq t1,x0,mul_loop_end
+    andi t3,t1,1
+    beq t3,x0,mul_skip
+    add t2,t2,t0
+
+mul_skip:
+    slli t0,t0,1
+    srli t1,t1,1
+    j mul_loop_start
+
+mul_loop_end:
+```
+
+The result of each multiplication `t2` is accumulated into `a7`.
+```
+    add a7,a7,t2
+```
 
 ## Matrix Multiplication
 
