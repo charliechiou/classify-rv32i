@@ -30,8 +30,26 @@ To enable our model to learn more complex relationships within the data, we impl
 If the input value is less than 0, the output is set to 0. If the input value is greater than or equal to 0, the output equals the input.  
 
 ### Methodology
-I used the `bnez` instruction to iterate through the input vector and employed `bltz` to check whether each element is less than zero. If so, jump to `set_zero` and set the value to zero.
+Using the `bnez` instruction to check whether there are still element need to be handle and employed `bltz` to check whether each element is less than zero.
 
+```assembly
+loop_start:
+    ...
+    bltz t1,set_zero
+    ...
+store_element:
+    addi a0, a0, 4 # move pointer to next element
+    addi a1, a1, -1 # decrease the number of remain element
+    bnez a1, loop_start
+end:
+```
+
+If so, jump to `set_zero` and set the value to zero.
+
+```assembly
+set_zero:
+    li t1, 0 #set element to zero
+```
 ## Argmax
 
 ### Introduction

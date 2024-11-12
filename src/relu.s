@@ -36,8 +36,8 @@ set_zero:
 
 store_element:
     sw t1,0(a0)
-    addi a0, a0, 4
-    addi a1, a1, -1
+    addi a0, a0, 4 #move pointer to next element
+    addi a1, a1, -1 #decrease the number of remain element
     bnez a1, loop_start
     
 end:
