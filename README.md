@@ -187,13 +187,8 @@ The outer loop uses `s0` as a counter to track the current row of A. After confi
 In the inner loop, pointers are set to the beginning of the current row of A and the current column of B. The appropriate stride values are configured, and then the dot function is called to calculate and store the resulting element in matrix C.
 
 ```
-    addi sp, sp, -24
-    sw a0, 0(sp)
-    sw a1, 4(sp)
-    sw a2, 8(sp)
-    sw a3, 12(sp)
-    sw a4, 16(sp)
-    sw a5, 20(sp)
+    # prologue
+    ...
     
     mv a0, s3 # setting pointer for matrix A into the correct argument value
     mv a1, s4 # setting pointer for Matrix B into the correct argument value
@@ -205,13 +200,8 @@ In the inner loop, pointers are set to the beginning of the current row of A and
     
     mv t0, a0 # storing result of the dot product into t0
     
-    lw a0, 0(sp)
-    lw a1, 4(sp)
-    lw a2, 8(sp)
-    lw a3, 12(sp)
-    lw a4, 16(sp)
-    lw a5, 20(sp)
-    addi sp, sp, 24
+    #epilogue
+    ...
 ```
 
 ## Read Matrix
@@ -361,3 +351,208 @@ Using the same approach of `fwrite`, write each element of the matrix into the f
 
     jal fwrite
 ```
+---
+## Classify
+After completing all components of the program, we need to integrate them together. The first step is to load the pretrained models **m0**, **m1**, and **Input Matrix** using the `Read Matrix` function.
+
+Code for reading m0:
+```  
+    # prologue
+    ...
+    
+    li a0, 4
+    jal malloc # malloc 4 bytes for an integer, rows
+    beq a0, x0, error_malloc
+    mv s3, a0 # save m0 rows pointer for later
+    
+    li a0, 4
+    jal malloc # malloc 4 bytes for an integer, cols
+    beq a0, x0, error_malloc
+    mv s4, a0 # save m0 cols pointer for later
+    
+    lw a1, 4(sp) # restores the argument pointer
+    
+    lw a0, 4(a1) # set argument 1 for the read_matrix function  
+    mv a1, s3 # set argument 2 for the read_matrix function
+    mv a2, s4 # set argument 3 for the read_matrix function
+    
+    jal read_matrix
+    
+    mv s0, a0 # setting s0 to the m0, aka the return value of read_matrix
+    
+    # epilogue
+    ...
+```
+Similarly, the same approach is applied to read **m1** and **Input Matrix**.
+
+Next, we compute the matmul for **m0** and **Input Matrix**.
+```
+    #prologue
+    ...
+    
+    lw t0, 0(s3)
+    lw t1, 0(s8)
+
+    #call custom mul
+mul_for_read_matrix:
+    li a0,0
+
+mul_loop_start_for_read_matrix:
+    beq t1,x0,mul_loop_end_for_read_matrix
+    andi t3,t1,1
+    beq t3,x0,mul_skip_for_read_matrix
+    add a0,a0,t0
+
+mul_skip_for_read_matrix:
+    slli t0,t0,1
+    srli t1,t1,1
+    j mul_loop_start_for_read_matrix
+
+mul_loop_end_for_read_matrix:
+
+    slli a0, a0, 2
+    jal malloc 
+    beq a0, x0, error_malloc
+    mv s9, a0 # move h to s9
+    
+    mv a6, a0 # h 
+    
+    mv a0, s0 # move m0 array to first arg
+    lw a1, 0(s3) # move m0 rows to second arg
+    lw a2, 0(s4) # move m0 cols to third arg
+    
+    mv a3, s2 # move input array to fourth arg
+    lw a4, 0(s7) # move input rows to fifth arg
+    lw a5, 0(s8) # move input cols to sixth arg
+    
+    jal matmul
+    
+    #epilogue
+    ...
+```
+After that, apply the ReLU activation function to compute the first layer outputs. ReLU ensures all negative values are set to zero, effectively introducing non-linearity to the layer.
+
+Repeat the process by applying the pretrained model m1 and the ReLU function to the first layer outputs to compute the second layer outputs.  
+
+then write the result by `Write Matrix` function.
+```
+    #prologue
+    ...
+    
+    lw a0, 16(a1) # load filename string into first arg
+    mv a1, s10 # load array into second arg
+    lw a2, 0(s5) # load number of rows into fourth arg
+    lw a3, 0(s8) # load number of cols into third arg
+    
+    jal write_matrix
+    
+    #epilogue
+    ...
+```
+
+Finally, implement the `argmax` function on the second layer outputs to determine the correct prediction.
+```
+   # Compute and return argmax(o)
+    #prologue
+    ...
+    
+    mv a0, s10 # load o array into first arg
+    lw t0, 0(s3)
+    lw t1, 0(s6)
+    
+    #call custom mul
+mul_for_argmax:
+    li a1,0
+
+mul_loop_start_for_argmax:
+    beq t1,x0,mul_loop_end_for_argmax
+    andi t3,t1,1
+    beq t3,x0,mul_skip_for_argmax
+    add a1,a1,t0
+
+mul_skip_for_argmax:
+    slli t0,t0,1
+    srli t1,t1,1
+    j mul_loop_start_for_argmax
+
+mul_loop_end_for_argmax:
+    
+    jal argmax
+    
+    mv t0, a0 # move return value of argmax into t0
+    
+    # epilogue
+    ...
+    
+    mv a0, t0
+
+    # If enabled, print argmax(o) and newline
+    bne a2, x0, epilouge
+    
+    # prologue
+    ...
+    
+    jal print_int
+    li a0, '\n'
+    jal print_char
+    
+    # epilogue
+    ...
+```
+---
+## Appendix A : Customize multiplication
+Since my project involves numerous customized multiplication operations, I will explain each function separately here.
+
+The code performs a bitwise multiplication, implementing multiplication using bitwise addition and shift operations. 
+
+```
+# Bitwise multiplication for t0 and t1
+
+mul:
+    li a0,0 # a0 save the result
+
+mul_loop_start:
+    beq t1,x0,mul_loop_end
+    andi t3,t1,1
+    beq t3,x0,mul_skip
+    add a0,a0,t0
+
+mul_skip:
+    slli t0,t0,1
+    srli t1,t1,1
+    j mul_loop_start
+```
+Let's break down the code step-by-step:
+### Initialization
+```
+    li a0,0 # a0 save the result
+```
++ Load the immediate value 0 into `a0`. This register will be used to accumulate the result.
+
+### Check the Loop
+```
+mul_loop_start:
+    beq t1,x0,mul_loop_end
+```
++ If t1 is equal to 0, the loop ends.
+
+### Check the Bit
+```
+    andi t3,t1,1
+    beq t3,x0,mul_skip
+    add a0,a0,t0
+```
++ Extract the LSB of t1
++ If the LSB of `t1` is **0** there is no need to do the addition.
++ If the LSB of `t1` is **1** then add `t0` to the accumulator.
+
+### Shift to next Bit
+```
+    slli t0,t0,1
+    srli t1,t1,1
+    j mul_loop_start
+```
++ Shift `t0` **left** by one bit, effectively multiplying it by 2. This operation prepares the multiplicand for the next higher bit.
++ Shift `t1` **right** by one bit, effectively removing the processed bit. This operation prepares for the next iteration.
+
+The simple algorithm uses a **bitwise AND operation** to check each bit of the multiplier `t1`.
