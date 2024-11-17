@@ -22,13 +22,13 @@ Implement essential matrix operations critical for neural network inference, inc
 #### The following will describe the purpose and function of each component :
 
 ## Outline
-- [Relu](#ReLu_(_Rectified_Linear_Unit_))
-- [Argmax](#Argmax)
-- [Dot product](#Dot_product)
-- [Matrix Multiplication](#Matrix_Multiplication)
-- [Read Matrix](#Read_Matrix)
-- [Write Matrix](#Write_Matrix)
-- [Classify](#Classify)
+- [ReLU](#relu)
+- [Argmax](#argmax)
+- [Dot Product](#dot-product)
+- [Matrix Multiplication](#matrix-multiplication)
+- [Read Matrix](#read-matrix)
+- [Write Matrix](#write-matrix)
+- [Classify](#classify)
 
 ## ReLu ( Rectified Linear Unit )
 
