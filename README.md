@@ -22,7 +22,7 @@ Implement essential matrix operations critical for neural network inference, inc
 #### The following will describe the purpose and function of each component :
 
 ## Outline
-- [ReLU](#ReLu-(-Rectified-Linear-Unit-))
+- [ReLU](#ReLu)
 - [Argmax](#argmax)
 - [Dot Product](#dot-product)
 - [Matrix Multiplication](#matrix-multiplication)
@@ -30,7 +30,7 @@ Implement essential matrix operations critical for neural network inference, inc
 - [Write Matrix](#write-matrix)
 - [Classify](#classify)
 
-## ReLu ( Rectified Linear Unit )
+## ReLu
 
 ### Introduction
 
